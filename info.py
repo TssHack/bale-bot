@@ -1,0 +1,2 @@
+token = "‏‏361743011:J1asUPWCBJmVW77rLrPt6YGB5HvtjL4ZTA197rvv"
+CHANNEL_ID = "@shafag_tm"
