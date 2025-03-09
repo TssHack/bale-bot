@@ -1,4 +1,4 @@
-from balethon.objects import InlineKeyboard, ReplyKeyboard
+from balethon.objects import InlineKeyboard, ReplyKeyboard, InlineKeyboardButton
 #KEYBORD
 inline_buttons = InlineKeyboard(
     [("📌 بخش کاربردی و ابزاری", "tools")],
