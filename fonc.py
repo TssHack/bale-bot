@@ -1,4 +1,4 @@
-mport json
+import json
 import locale
 from convertdate import islamic
 import requests
