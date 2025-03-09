@@ -304,35 +304,39 @@ def get_weather(city):
     #FOTBAL
 def get_f():
     try:
-        response = requests.get("https://open.wiki-api.ir/apis-1/Footballi")
+        response = requests.get("https://open.wiki-api.ir/apis-1/Footballi", timeout=10)
+        response.raise_for_status()  # بررسی وضعیت پاسخ (۴xx یا ۵xx)
         data = response.json()
 
-        if 'status' in data and data['status']:
-            if 'results' in data:
-                matches = data['results']
-                match_report = "⚽ بازی‌های امروز:\n\n"
-                
-                for match in matches:
-                    competition = match.get('competition', 'نامشخص')
-                    home_team = match.get('home_team', 'نامشخص')
-                    away_team = match.get('away_team', 'نامشخص')
-                    time = match.get('time', 'زمان مشخص نیست') if match.get('time', 'N/A') != "N/A" else "زمان مشخص نیست"
-                    url = match.get('url', '#')
-                    
-                    match_report += (
-                        f"🏆 {competition}\n"
-                        f"🏠 {home_team} vs {away_team}\n"
-                        f"⏰ زمان: {time}\n"
-                        f"🔗 [مشاهده بازی]({url})\n\n"
-                    )
+        if not data.get('status', False):
+            return "متاسفانه نتوانستم اطلاعات بازی‌های امروز را دریافت کنم."
 
-                return match_report
-            else:
-                return "اطلاعات بازی‌ها در دسترس نیست."
-        else:
-            return "متاسفانه نتواستم اطلاعات بازی‌های امروز را دریافت کنم."
-    #mashin
+        matches = data.get('results', [])
+        if not matches:
+            return "اطلاعات بازی‌ها در دسترس نیست."
 
+        match_report = "⚽ بازی‌های امروز:\n\n"
+        
+        for match in matches[:20]:  # محدود کردن به ۲۰ بازی اول
+            competition = match.get('competition', 'نامشخص') or 'نامشخص'
+            home_team = match.get('home_team', 'نامشخص') or 'نامشخص'
+            away_team = match.get('away_team', 'نامشخص') or 'نامشخص'
+            time = match.get('time', 'زمان مشخص نیست') if match.get('time') and match.get('time') != "N/A" else "زمان مشخص نیست"
+            url = match.get('url', '')
+
+            match_report += (
+                f"🏆 {competition}\n"
+                f"🏠 {home_team} vs {away_team}\n"
+                f"⏰ زمان: {time}\n"
+                f"🔗 {'[مشاهده بازی](' + url + ')' if url else 'لینک موجود نیست'}\n\n"
+            )
+
+        return match_report
+
+    except requests.exceptions.RequestException as req_err:
+        return f"خطا در اتصال به سرور: {req_err}"
+    except Exception as e:
+        return f"خطا در پردازش اطلاعات بازی‌ها: {e}"
     #TIPAX
 def track_parcel(tracking_code):
     # بررسی اینکه آیا کد رهگیری 21 رقمی است
